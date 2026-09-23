@@ -1,11 +1,19 @@
-const CACHE="iron-recorder-v1";
-const CORE=["./","./index.html","./manifest.webmanifest"];
-self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE))));
-self.addEventListener("activate",e=>e.waitUntil(self.clients.claim()));
+const CACHE="iron-recorder-v3";
+self.addEventListener("install",e=>{self.skipWaiting()});
+self.addEventListener("activate",e=>e.waitUntil((async()=>{
+  for(const k of await caches.keys()) if(k!==CACHE) await caches.delete(k);
+  await self.clients.claim();
+})()));
 self.addEventListener("fetch",e=>{
-  e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{
-    const copy=resp.clone();
-    caches.open(CACHE).then(c=>c.put(e.request,copy)).catch(()=>{});
-    return resp;
-  })));
+  if(e.request.mode==="navigate"){
+    e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));
+    return;
+  }
+  e.respondWith(
+    fetch(e.request).then(r=>{
+      const c=r.clone();
+      caches.open(CACHE).then(x=>x.put(e.request,c)).catch(()=>{});
+      return r;
+    }).catch(()=>caches.match(e.request))
+  );
 });

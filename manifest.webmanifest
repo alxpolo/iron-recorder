@@ -1,9 +1,8 @@
 {
   "name": "Iron Recorder",
   "short_name": "Iron Recorder",
-  "start_url": "./",
+  "start_url": "./?v=3",
   "display": "standalone",
   "background_color": "#0b0b0c",
-  "theme_color": "#111111",
-  "description": "Import, locally transcribe, rename and organize voice-recorder files."
+  "theme_color": "#111111"
 }
